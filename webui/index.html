@@ -77,6 +77,28 @@
 		<div style="display: contents">
 			<script>
 				{
+					if (window.location.hash.includes('mcp-servers')) {
+						window.location.hash = '#/';
+						window.__settings_section = 'tools';
+						const triggerMcp = () => {
+							if (typeof window.__openMcpServers === 'function') {
+								window.__openMcpServers();
+							} else {
+								setTimeout(triggerMcp, 100);
+							}
+						};
+						setTimeout(triggerMcp, 200);
+					}
+
+					window.addEventListener('hashchange', () => {
+						if (window.location.hash.includes('mcp-servers')) {
+							window.location.hash = '#/';
+							if (typeof window.__openMcpServers === 'function') {
+								window.__openMcpServers();
+							}
+						}
+					});
+
 					__sveltekit_mp7d11 = {
 						base: new URL('.', location).pathname.slice(0, -1)
 					};
