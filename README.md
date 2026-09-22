@@ -8,7 +8,7 @@
 
 **USB Local AI** is a complete, self-contained, 100% offline portable AI workstation that runs directly from any USB flash drive or portable SSD on any Windows computer.
 
-No Python, no PyTorch, no Docker, no CUDA configuration, and no administrative privileges required. Simply plug in your USB drive, run `Start-AI.bat`, and chat with state-of-the-art **Text Reasoning** (DeepSeek-R1, Qwen Thinking) and **Multimodal Vision** models with full image upload capabilities!
+No Python, no PyTorch, no Docker, no CUDA configuration, and no administrative privileges required. Simply plug in your USB drive, run `Start-AI-Router.bat`, and chat with state-of-the-art **Text Reasoning** (DeepSeek-R1, Qwen Thinking) and **Multimodal Vision** models with full image upload capabilities!
 
 ---
 
@@ -81,7 +81,7 @@ Because model files are several gigabytes each, they are not included in this re
 
 ```text
 USB Drive (e.g. E:\)
-├── Start-AI.bat                 <-- Double-click to launch router & Web UI
+├── Start-AI-Router.bat          <-- Double-click to launch router & Web UI
 ├── Install-Llama-Router.bat     <-- Run once to download llama.cpp server
 ├── models.ini.template          <-- Template configuration reference
 ├── scripts\
@@ -115,8 +115,9 @@ Double-click **`Install-Llama-Router.bat`**.
 
 ### Step 3: Add Models & Launch!
 1. Download one or more models from the [Recommended Models](#-recommended-models--download-links) section into the `Models\` folder.
-2. Double-click **`Start-AI.bat`**.
+2. Double-click **`Start-AI-Router.bat`**.
 3. Your default browser will automatically open to `http://127.0.0.1:8080`.
+
 
 ---
 
@@ -157,7 +158,7 @@ The server runs an OpenAI-compatible REST API at:
 
 <details>
 <summary><b>The image upload paperclip is not visible in the Web UI.</b></summary>
-Ensure you have downloaded both the model <code>.gguf</code> and the matching <code>mmproj-*.gguf</code> file, and placed them in the same subfolder under <code>Models\</code>. When starting <code>Start-AI.bat</code>, the console should display <code>[VISION]</code> next to the model name.
+Ensure you have downloaded both the model <code>.gguf</code> and the matching <code>mmproj-*.gguf</code> file, and placed them in the same subfolder under <code>Models\</code>. When starting <code>Start-AI-Router.bat</code>, the console should display <code>[VISION]</code> next to the model name.
 </details>
 
 <details>

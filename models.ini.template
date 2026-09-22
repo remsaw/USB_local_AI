@@ -2,7 +2,7 @@
 ; Portable Local AI - Models Preset Template
 ; ========================================================
 ; This file is an example of how presets are structured.
-; Start-AI.bat automatically auto-generates models.ini by scanning
+; Start-AI-Router.bat automatically auto-generates models.ini by scanning
 ; your Models folder, so you normally do NOT need to edit this file manually.
 ;
 ; If you wish to customize context size, thread count, or GPU offloading,

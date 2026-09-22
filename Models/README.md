@@ -27,7 +27,7 @@ Models\
 ```
 
 > [!TIP]
-> When `Start-AI.bat` launches, it automatically detects any folder containing both a model and an `mmproj` projector, registers it with image upload capabilities, and displays the paperclip/attachment icon in the Web UI!
+> When `Start-AI-Router.bat` launches, it automatically detects any folder containing both a model and an `mmproj` projector, registers it with image upload capabilities, and displays the paperclip/attachment icon in the Web UI!
 
 ## Where to Download Models
 Search for GGUF quantizations on [Hugging Face](https://huggingface.co/models?search=gguf):

@@ -71,6 +71,6 @@ echo ========================================================
 echo.
 echo Next step:
 echo 1. Put your .gguf models into the 'Models' folder.
-echo 2. Run Start-AI.bat to start chatting!
+echo 2. Run Start-AI-Router.bat to start chatting!
 echo.
 pause
