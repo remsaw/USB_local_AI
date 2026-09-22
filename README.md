@@ -86,6 +86,10 @@ USB Drive (e.g. E:\)
 ├── Open-MCP-Servers.bat         <-- One-click shortcut to MCP Servers management
 ├── Install-Llama-Router.bat     <-- Run once to download llama.cpp server
 ├── models.ini.template          <-- Template configuration reference
+├── webui\                       <-- Pre-configured Web UI (with MCP in sidebar)
+│   ├── index.html
+│   ├── _app\
+│   └── recommended-mcp\
 ├── scripts\
 │   └── scan_models.ps1          <-- Auto-detects models & pairs vision projectors
 ├── Models\                      <-- Drop your models here
@@ -141,10 +145,11 @@ Double-click **`Install-Llama-Router.bat`**.
 The server comes with **MCP CORS Proxy (`--webui-mcp-proxy`)** enabled, allowing your local models to connect to external MCP servers and tools directly through the Web UI.
 
 ### How to Access & Connect MCP Servers:
-You can access MCP server management in three easy ways:
-1. **Via the Chat Input**: In the chat window, click the **`+`** icon on the left side of the input box (next to *"Type a message..."*), then click **MCP Servers**.
-2. **Via One-Click Shortcut**: Double-click **`Open-MCP-Servers.bat`** on your USB drive.
-3. **Via Direct Browser URL**: Navigate directly to [`http://127.0.0.1:8080/#/mcp-servers`](http://127.0.0.1:8080/#/mcp-servers).
+You can access MCP server management easily:
+1. **Left Sidebar Menu (Direct)**: Click **MCP Servers** directly on the left navigation bar, positioned conveniently between **Search** and **Settings**.
+2. **Via the Chat Input**: In the chat window, click the **`+`** icon next to the input prompt, then select **MCP Servers**.
+3. **Via One-Click Shortcut**: Double-click **`Open-MCP-Servers.bat`** on your USB drive.
+4. **Via Direct Browser URL**: Open [`http://127.0.0.1:8080/#/mcp-servers`](http://127.0.0.1:8080/#/mcp-servers).
 
 3. Click **+ Add New Server**.
 4. Select from the **4 Built-in Recommended Servers** (or connect any custom MCP server by URL):

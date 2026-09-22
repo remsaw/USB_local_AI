@@ -68,6 +68,12 @@ if exist "%ROOT_DIR%\models.ini" (
     set "MODEL_ARGS=--models-dir "%MODELS_DIR%""
 )
 
+:: Configure Web UI path if custom webui folder is present
+set "WEBUI_ARG="
+if exist "%ROOT_DIR%\webui" (
+    set "WEBUI_ARG=--path "%ROOT_DIR%\webui""
+)
+
 echo --------------------------------------------------------
 echo  Web UI URL : http://127.0.0.1:8080
 echo  Storage    : %MODELS_DIR%
@@ -81,16 +87,16 @@ echo  2. Image Upload: Select a [VISION] model from the dropdown.
 echo     Drag-and-drop an image or click the paperclip icon.
 echo  3. Reasoning Models: Select a [TEXT/R1] model to view
 echo     internal chain-of-thought tokens.
-echo  4. MCP Servers: Click the [+] button next to the chat input
-echo     and select 'MCP Servers' (or open http://127.0.0.1:8080/#/mcp-servers).
-echo     Add Exa Web Search, Hugging Face, GitHub, or Context7.
+echo  4. MCP Servers: Access 'MCP Servers' directly in the left
+echo     sidebar between Search and Settings.
 echo.
 echo [*] Opening Web UI in your default browser...
 start "" "http://127.0.0.1:8080"
 echo [*] Starting llama-server router...
 echo.
 
-"%SERVER%" --host 127.0.0.1 --port 8080 !MODEL_ARGS! --models-max 1 --ctx-size 8192 --n-gpu-layers 0 --webui-mcp-proxy
+"%SERVER%" --host 127.0.0.1 --port 8080 !MODEL_ARGS! !WEBUI_ARG! --models-max 1 --ctx-size 8192 --n-gpu-layers 0 --webui-mcp-proxy
+
 
 
 
