@@ -2,6 +2,12 @@ param(
     [string]$Root = ""
 )
 
+# Strip any surrounding quotes or trailing slashes passed from Windows batch
+if (-not [string]::IsNullOrWhiteSpace($Root)) {
+    $Root = $Root.Trim().Trim('"', '''').TrimEnd('\', '/')
+}
+
+# If Root is still empty, default to parent directory of this script
 if ([string]::IsNullOrWhiteSpace($Root)) {
     $Root = Split-Path -Parent $PSScriptRoot
 }
@@ -9,16 +15,16 @@ if ([string]::IsNullOrWhiteSpace($Root)) {
 $modelsDir = Join-Path $Root "Models"
 $iniPath = Join-Path $Root "models.ini"
 
-if (-not (Test-Path $modelsDir)) {
+if (-not (Test-Path -LiteralPath $modelsDir)) {
     Write-Host "[!] Models directory not found at: $modelsDir" -ForegroundColor Yellow
     exit 0
 }
 
 # Scan for all GGUF files
-$allGguf = Get-ChildItem -Path $modelsDir -Filter "*.gguf" -Recurse -File -ErrorAction SilentlyContinue
+$allGguf = Get-ChildItem -LiteralPath $modelsDir -Filter "*.gguf" -Recurse -File -ErrorAction SilentlyContinue
 if (-not $allGguf -or $allGguf.Count -eq 0) {
-    Write-Host "[!] No .gguf models found in $modelsDir" -ForegroundColor Yellow
-    Write-Host "    Place your .gguf models inside the Models folder." -ForegroundColor Gray
+    Write-Host "[*] No .gguf models found in $modelsDir yet." -ForegroundColor Yellow
+    Write-Host "    Download GGUF models into the Models folder to get started." -ForegroundColor Gray
     exit 0
 }
 
@@ -39,7 +45,10 @@ $textCount = 0
 
 foreach ($m in $models) {
     # Determine alias name: use folder name if in a subfolder, otherwise file base name
-    if ($m.Directory.FullName -ne (Get-Item $modelsDir).FullName) {
+    $parentDir = $m.Directory.FullName.TrimEnd('\', '/')
+    $modelsRoot = (Get-Item -LiteralPath $modelsDir).FullName.TrimEnd('\', '/')
+
+    if ($parentDir -ne $modelsRoot) {
         $alias = $m.Directory.Name
     } else {
         $alias = [System.IO.Path]::GetFileNameWithoutExtension($m.Name)
@@ -51,7 +60,7 @@ foreach ($m in $models) {
     # Check for matching mmproj:
     $matchedMm = $null
     # Rule 1: mmproj in the same subfolder
-    if ($m.Directory.FullName -ne (Get-Item $modelsDir).FullName) {
+    if ($parentDir -ne $modelsRoot) {
         $matchedMm = $mmprojs | Where-Object { $_.DirectoryName -eq $m.DirectoryName } | Select-Object -First 1
     } else {
         # Rule 2: in root Models dir, match if filename has vision tags (vl, vision, llava, minicpm, etc.)
@@ -65,13 +74,22 @@ foreach ($m in $models) {
         } | Select-Object -First 1
     }
 
-    # Make relative path with forward slashes for llama.cpp portability
-    $relModel = $m.FullName.Substring($Root.Length).TrimStart('\', '/').Replace('\', '/')
+    # Relative path calculation (safe for any drive or path with spaces)
+    $relModel = $m.FullName
+    if ($relModel.StartsWith($Root, [System.StringComparison]::OrdinalIgnoreCase)) {
+        $relModel = $relModel.Substring($Root.Length).TrimStart('\', '/')
+    }
+    $relModel = $relModel.Replace('\', '/')
 
     $lines += "[$cleanAlias]"
     $lines += "model = $relModel"
     if ($matchedMm) {
-        $relMm = $matchedMm.FullName.Substring($Root.Length).TrimStart('\', '/').Replace('\', '/')
+        $relMm = $matchedMm.FullName
+        if ($relMm.StartsWith($Root, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $relMm = $relMm.Substring($Root.Length).TrimStart('\', '/')
+        }
+        $relMm = $relMm.Replace('\', '/')
+
         $lines += "mmproj = $relMm"
         $visionCount++
         Write-Host " [VISION]   $cleanAlias" -ForegroundColor Green

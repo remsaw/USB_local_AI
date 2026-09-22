@@ -1,27 +1,50 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
-title Portable Local AI - Vision & Reasoning Router
+title Portable Local AI - Vision and Reasoning Router
 cd /d "%~dp0"
 
-set "MODELS_DIR=%~dp0Models"
+:: Get current directory without trailing backslash
+set "ROOT_DIR=%~dp0"
+if "%ROOT_DIR:~-1%"=="\" set "ROOT_DIR=%ROOT_DIR:~0,-1%"
+
+set "MODELS_DIR=%ROOT_DIR%\Models"
 set "SERVER="
 
-:: Locate llama-server.exe
-for /r "%~dp0llama-router" %%F in (llama-server.exe) do if not defined SERVER set "SERVER=%%F"
+:: Check if llama-server.exe exists
+if exist "%ROOT_DIR%\llama-router\llama-server.exe" (
+    set "SERVER=%ROOT_DIR%\llama-router\llama-server.exe"
+) else (
+    for /r "%ROOT_DIR%\llama-router" %%F in (llama-server.exe) do (
+        if exist "%%F" if not defined SERVER set "SERVER=%%F"
+    )
+)
 
+:: If server not found, offer one-click installation
 if not defined SERVER (
     echo ========================================================
     echo  [!] llama-server.exe was not found!
     echo ========================================================
     echo.
-    echo  Please run Install-Llama-Router.bat first to download
-    echo  the llama.cpp server binaries automatically.
+    echo  The llama.cpp server binaries have not been downloaded yet.
     echo.
-    pause
-    exit /b 1
+    set /p "RUN_INSTALL=Would you like to download and install llama-server now? (Y/N): "
+    if /i "!RUN_INSTALL!"=="Y" (
+        echo.
+        call "%ROOT_DIR%\Install-Llama-Router.bat"
+        if exist "%ROOT_DIR%\llama-router\llama-server.exe" (
+            set "SERVER=%ROOT_DIR%\llama-router\llama-server.exe"
+        )
+    )
+    if not defined SERVER (
+        echo.
+        echo Please run Install-Llama-Router.bat first, then run Start-AI-Router.bat.
+        echo.
+        pause
+        exit /b 1
+    )
 )
 
-:: Create Models directory if it doesn't exist
+:: Ensure Models directory exists
 if not exist "%MODELS_DIR%" mkdir "%MODELS_DIR%"
 
 echo ========================================================
@@ -32,14 +55,14 @@ echo.
 
 :: Automatically scan Models folder and pair vision models with mmproj projectors
 echo [*] Scanning Models folder and configuring presets...
-if exist "%~dp0scripts\scan_models.ps1" (
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\scan_models.ps1" -Root "%~dp0"
+if exist "%ROOT_DIR%\scripts\scan_models.ps1" (
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%ROOT_DIR%\scripts\scan_models.ps1" -Root "%ROOT_DIR%"
 )
 echo.
 
 set "PRESET_ARG="
-if exist "%~dp0models.ini" (
-    set "PRESET_ARG=--models-preset "%~dp0models.ini""
+if exist "%ROOT_DIR%\models.ini" (
+    set "PRESET_ARG=--models-preset "%ROOT_DIR%\models.ini""
 )
 
 echo --------------------------------------------------------

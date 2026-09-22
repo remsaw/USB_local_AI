@@ -3,9 +3,12 @@ setlocal EnableExtensions
 title Install llama.cpp Router - Windows x64 CPU
 cd /d "%~dp0"
 
+set "ROOT_DIR=%~dp0"
+if "%ROOT_DIR:~-1%"=="\" set "ROOT_DIR=%ROOT_DIR:~0,-1%"
+
 set "URL=https://github.com/ggml-org/llama.cpp/releases/download/b11065/llama-b11065-bin-win-cpu-x64.zip"
-set "ZIP=%~dp0llama-b11065-bin-win-cpu-x64.zip"
-set "DIR=%~dp0llama-router"
+set "ZIP=%ROOT_DIR%\llama-b11065-bin-win-cpu-x64.zip"
+set "DIR=%ROOT_DIR%\llama-router"
 
 echo ========================================================
 echo   Portable Local AI - llama.cpp Windows x64 CPU Setup
@@ -54,7 +57,11 @@ if errorlevel 1 (
 del /q "%ZIP%" >nul 2>&1
 
 set "SERVER="
-for /r "%DIR%" %%F in (llama-server.exe) do if not defined SERVER set "SERVER=%%F"
+if exist "%DIR%\llama-server.exe" (
+    set "SERVER=%DIR%\llama-server.exe"
+) else (
+    for /r "%DIR%" %%F in (llama-server.exe) do if exist "%%F" if not defined SERVER set "SERVER=%%F"
+)
 
 if not defined SERVER (
     echo.
