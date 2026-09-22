@@ -20,6 +20,7 @@ No Python, no PyTorch, no Docker, no CUDA configuration, and no administrative p
 - 🔀 **Dynamic Model Router**: Switch between multiple models instantly from a single dropdown without restarting the server.
 - 💾 **Smart RAM Management (`--models-max 1`)**: Holds unlimited models on your USB drive while loading only one model into RAM at a time, preventing Out-Of-Memory (OOM) crashes on 8GB/16GB machines.
 - 🌐 **Modern Built-in Web UI**: Clean, responsive browser interface served locally at `http://127.0.0.1:8080`.
+- 🔌 **Native MCP (Model Context Protocol) Support**: Connect directly to remote MCP servers (Exa Web Search, Hugging Face, GitHub, Context7) via the Web UI sidebar to equip local models with live tools.
 - 🔌 **OpenAI-Compatible API**: Seamlessly connects with third-party tools like Continue.dev, Cursor, LibreChat, Chatbox, and Obsidian.
 
 ---
@@ -131,6 +132,22 @@ Double-click **`Install-Llama-Router.bat`**.
    - *"Analyze this chart and summarize key trends."*
    - *"Convert this screenshot of a webpage or UI into clean HTML/Tailwind CSS."*
    - *"What is causing this software error in the screenshot?"*
+
+---
+
+## 🛠️ Model Context Protocol (MCP) Integration
+
+The server comes with **MCP CORS Proxy (`--webui-mcp-proxy`)** enabled, allowing your local models to connect to external MCP servers and tools directly through the Web UI.
+
+### Connecting MCP Servers:
+1. In the Web UI, click **MCP Servers** in the left sidebar (or navigate to `http://127.0.0.1:8080/#/mcp-servers`).
+2. Click **+ Add New Server**.
+3. Select from the **4 Recommended Servers** or connect any custom MCP server by URL:
+   - **Exa**: Real-time web search and full webpage content extraction into clean markdown.
+   - **Hugging Face**: Search and browse AI models, datasets, spaces, and documentation.
+   - **GitHub**: Search repositories, code, issues, and pull requests.
+   - **Context7**: Live, version-accurate documentation and code examples for libraries and frameworks.
+4. Set authorization headers if required by the service, and your model can now invoke external tools on the fly!
 
 ---
 

@@ -78,13 +78,16 @@ echo  2. Image Upload: Select a [VISION] model from the dropdown.
 echo     Drag-and-drop an image or click the paperclip icon.
 echo  3. Reasoning Models: Select a [TEXT/R1] model to view
 echo     internal chain-of-thought tokens.
+echo  4. MCP Servers: Connect external tools (Exa Web Search,
+echo     Hugging Face, GitHub, Context7) via the Web UI sidebar.
 echo.
 echo [*] Opening Web UI in your default browser...
 start "" "http://127.0.0.1:8080"
 echo [*] Starting llama-server router...
 echo.
 
-"%SERVER%" --host 127.0.0.1 --port 8080 !PRESET_ARG! --models-dir "%MODELS_DIR%" --models-max 1 --ctx-size 8192 --n-gpu-layers 0
+"%SERVER%" --host 127.0.0.1 --port 8080 !PRESET_ARG! --models-dir "%MODELS_DIR%" --models-max 1 --ctx-size 8192 --n-gpu-layers 0 --webui-mcp-proxy
+
 
 echo.
 echo ========================================================
