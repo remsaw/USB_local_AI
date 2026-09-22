@@ -124,7 +124,13 @@ Double-click **`Install-Llama-Router.bat`**.
 2. Double-click **`Start-AI-Router.bat`**.
 3. Your default browser will automatically open to `http://127.0.0.1:8080`.
 
-
+🔄 Add & Refresh Models
+1. Place your GGUF model inside Models\
+2. Open the Web UI
+3. Open the model selector
+4. Click ↻ Refresh Models
+5. Select the new model
+6. Click Load
 ---
 
 ## 📸 How to Upload Images & Use Vision Models
