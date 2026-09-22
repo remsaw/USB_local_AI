@@ -1,0 +1,31 @@
+# ========================================================
+# Git Ignore for USB Local AI
+# Never commit multi-gigabyte models or executable binaries
+# ========================================================
+
+# Model weights
+*.gguf
+*.bin
+*.safetensors
+Models/*
+!Models/README.md
+!Models/.gitkeep
+
+# Executable binaries & downloaded distributions
+llama-router/
+llamafile*
+*.exe
+*.dll
+*.zip
+
+# Generated runtime configuration & logs
+models.ini
+*.log
+*.tmp
+
+# Windows system & USB drive files
+System Volume Information/
+$RECYCLE.BIN/
+[Dd]esktop.ini
+Thumbs.db
+.DS_Store

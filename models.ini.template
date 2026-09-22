@@ -1,0 +1,24 @@
+; ========================================================
+; Portable Local AI - Models Preset Template
+; ========================================================
+; This file is an example of how presets are structured.
+; Start-AI.bat automatically auto-generates models.ini by scanning
+; your Models folder, so you normally do NOT need to edit this file manually.
+;
+; If you wish to customize context size, thread count, or GPU offloading,
+; you can define your custom presets here.
+;
+; Section name = Model alias shown in the Web UI dropdown
+;
+; Example Text / Reasoning Model:
+; [DeepSeek-R1-Distill-Qwen-7B]
+; model = Models/DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf
+; ctx-size = 8192
+; n-gpu-layers = 0
+;
+; Example Multimodal Vision Model (Requires model + mmproj):
+; [Qwen2.5-VL-7B-Instruct]
+; model = Models/Qwen2.5-VL-7B/Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf
+; mmproj = Models/Qwen2.5-VL-7B/mmproj-Qwen2.5-VL-7B-Instruct-F16.gguf
+; ctx-size = 8192
+; n-gpu-layers = 0
