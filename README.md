@@ -139,15 +139,17 @@ Double-click **`Install-Llama-Router.bat`**.
 
 The server comes with **MCP CORS Proxy (`--webui-mcp-proxy`)** enabled, allowing your local models to connect to external MCP servers and tools directly through the Web UI.
 
-### Connecting MCP Servers:
-1. In the Web UI, click **MCP Servers** in the left sidebar (or navigate to `http://127.0.0.1:8080/#/mcp-servers`).
-2. Click **+ Add New Server**.
-3. Select from the **4 Recommended Servers** or connect any custom MCP server by URL:
+### How to Access & Connect MCP Servers:
+You can access MCP server management in two ways:
+1. **Via the Chat Input**: In the chat window, click the **`+`** icon on the left side of the input box (next to *"Type a message..."*), then click **MCP Servers**.
+2. **Via Direct URL**: Navigate directly to [`http://127.0.0.1:8080/#/mcp-servers`](http://127.0.0.1:8080/#/mcp-servers) in your browser.
+3. Click **+ Add New Server**.
+4. Select from the **4 Built-in Recommended Servers** (or connect any custom MCP server by URL):
    - **Exa**: Real-time web search and full webpage content extraction into clean markdown.
    - **Hugging Face**: Search and browse AI models, datasets, spaces, and documentation.
    - **GitHub**: Search repositories, code, issues, and pull requests.
    - **Context7**: Live, version-accurate documentation and code examples for libraries and frameworks.
-4. Set authorization headers if required by the service, and your model can now invoke external tools on the fly!
+5. Set authorization headers if required by the service, and your model can now invoke external tools on the fly!
 
 ---
 

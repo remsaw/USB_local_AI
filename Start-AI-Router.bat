@@ -78,8 +78,9 @@ echo  2. Image Upload: Select a [VISION] model from the dropdown.
 echo     Drag-and-drop an image or click the paperclip icon.
 echo  3. Reasoning Models: Select a [TEXT/R1] model to view
 echo     internal chain-of-thought tokens.
-echo  4. MCP Servers: Connect external tools (Exa Web Search,
-echo     Hugging Face, GitHub, Context7) via the Web UI sidebar.
+echo  4. MCP Servers: Click the [+] button next to the chat input
+echo     and select 'MCP Servers' (or open http://127.0.0.1:8080/#/mcp-servers).
+echo     Add Exa Web Search, Hugging Face, GitHub, or Context7.
 echo.
 echo [*] Opening Web UI in your default browser...
 start "" "http://127.0.0.1:8080"
