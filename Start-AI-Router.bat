@@ -60,13 +60,10 @@ if exist "%ROOT_DIR%\scripts\scan_models.ps1" (
 )
 echo.
 
-:: Configure model loading (use models.ini preset if available, otherwise fallback to directory scan)
-set "MODEL_ARGS="
-if exist "%ROOT_DIR%\models.ini" (
-    set "MODEL_ARGS=--models-preset "%ROOT_DIR%\models.ini""
-) else (
-    set "MODEL_ARGS=--models-dir "%MODELS_DIR%""
-)
+:: Configure model loading
+:: IMPORTANT: use the Models folder directly so /models?reload=1
+:: can discover newly added GGUF files without editing models.ini.
+set "MODEL_ARGS=--models-dir "%MODELS_DIR%""
 
 :: Configure Web UI path if custom webui folder is present
 set "WEBUI_ARG="

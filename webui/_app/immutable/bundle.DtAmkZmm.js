@@ -3768,4 +3768,91 @@ Expecting `+re.join(", ")+", got '"+(this.terminals_[H]||H)+"'":Z="Parse error o
   .wardley-notes text {
     fill: ${i.axisTextColor};
   }
-  `},"styles"),Jun={parser:Rut,db:Yun,renderer:Qun,styles:Zun};const edn=Object.freeze(Object.defineProperty({__proto__:null,diagram:Jun},Symbol.toStringTag,{value:"Module"})),tdn=Object.freeze(Object.defineProperty({__proto__:null,InfoModule:Dst,createInfoServices:Mst},Symbol.toStringTag,{value:"Module"})),rdn=Object.freeze(Object.defineProperty({__proto__:null,PacketModule:Lst,createPacketServices:Pst},Symbol.toStringTag,{value:"Module"})),ndn=Object.freeze(Object.defineProperty({__proto__:null,PieModule:Fst,createPieServices:Bst},Symbol.toStringTag,{value:"Module"})),idn=Object.freeze(Object.defineProperty({__proto__:null,TreeViewModule:Ust,createTreeViewServices:$st},Symbol.toStringTag,{value:"Module"})),adn=Object.freeze(Object.defineProperty({__proto__:null,ArchitectureModule:Gst,createArchitectureServices:zst},Symbol.toStringTag,{value:"Module"})),sdn=Object.freeze(Object.defineProperty({__proto__:null,GitGraphModule:Ist,createGitGraphServices:kst},Symbol.toStringTag,{value:"Module"})),odn=Object.freeze(Object.defineProperty({__proto__:null,EventModelingModule:Hst,createEventModelingServices:Vst},Symbol.toStringTag,{value:"Module"})),ldn=Object.freeze(Object.defineProperty({__proto__:null,RadarModule:Cst,createRadarServices:wst},Symbol.toStringTag,{value:"Module"})),cdn=Object.freeze(Object.defineProperty({__proto__:null,TreemapModule:Ast,createTreemapServices:Rst},Symbol.toStringTag,{value:"Module"})),udn=Object.freeze(Object.defineProperty({__proto__:null,WardleyModule:Nst,createWardleyServices:Ost},Symbol.toStringTag,{value:"Module"}));export{lpt as app,mdn as start};
+  `},"styles"),Jun={parser:Rut,db:Yun,renderer:Qun,styles:Zun};const edn=Object.freeze(Object.defineProperty({__proto__:null,diagram:Jun},Symbol.toStringTag,{value:"Module"})),tdn=Object.freeze(Object.defineProperty({__proto__:null,InfoModule:Dst,createInfoServices:Mst},Symbol.toStringTag,{value:"Module"})),rdn=Object.freeze(Object.defineProperty({__proto__:null,PacketModule:Lst,createPacketServices:Pst},Symbol.toStringTag,{value:"Module"})),ndn=Object.freeze(Object.defineProperty({__proto__:null,PieModule:Fst,createPieServices:Bst},Symbol.toStringTag,{value:"Module"})),idn=Object.freeze(Object.defineProperty({__proto__:null,TreeViewModule:Ust,createTreeViewServices:$st},Symbol.toStringTag,{value:"Module"})),adn=Object.freeze(Object.defineProperty({__proto__:null,ArchitectureModule:Gst,createArchitectureServices:zst},Symbol.toStringTag,{value:"Module"})),sdn=Object.freeze(Object.defineProperty({__proto__:null,GitGraphModule:Ist,createGitGraphServices:kst},Symbol.toStringTag,{value:"Module"})),odn=Object.freeze(Object.defineProperty({__proto__:null,EventModelingModule:Hst,createEventModelingServices:Vst},Symbol.toStringTag,{value:"Module"})),ldn=Object.freeze(Object.defineProperty({__proto__:null,RadarModule:Cst,createRadarServices:wst},Symbol.toStringTag,{value:"Module"})),cdn=Object.freeze(Object.defineProperty({__proto__:null,TreemapModule:Ast,createTreemapServices:Rst},Symbol.toStringTag,{value:"Module"})),udn=Object.freeze(Object.defineProperty({__proto__:null,WardleyModule:Nst,createWardleyServices:Ost},Symbol.toStringTag,{value:"Module"}));
+/* USB_local_AI custom UI enhancements - v3 */
+(()=> {
+  function findNativeMcp() {
+    return [...document.querySelectorAll('button,a')].find(el =>
+      (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '').trim() === 'MCP Servers'
+    );
+  }
+
+  function addMcpSidebar() {
+    // The current bundle already has a native MCP Servers item.
+    // Do NOT intercept its click; the app router owns that navigation.
+    if (findNativeMcp()) return;
+
+    if (document.getElementById('usb-local-ai-mcp')) return;
+
+    const settings = [...document.querySelectorAll('button,a')].find(el =>
+      (el.getAttribute('aria-label') || el.getAttribute('title') || '').trim() === 'Settings'
+    );
+    if (!settings || !settings.parentElement) return;
+
+    const b = document.createElement('a');
+    b.id = 'usb-local-ai-mcp';
+    b.href = '/#/mcp-servers';
+    b.title = 'MCP Servers';
+    b.setAttribute('aria-label','MCP Servers');
+    b.className = settings.className || 'flex items-center justify-center';
+    b.innerHTML = '<span style="font-size:18px;line-height:1">🔌</span><span class="usb-mcp-label">MCP Servers</span>';
+    b.style.cssText += ';display:flex;align-items:center;justify-content:flex-start;';
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #usb-local-ai-mcp .usb-mcp-label{display:none;margin-left:8px;white-space:nowrap}
+      .is-expanded #usb-local-ai-mcp .usb-mcp-label{display:inline}
+      #usb-local-ai-mcp{min-height:36px}
+    `;
+    document.head.appendChild(style);
+
+    settings.parentElement.insertBefore(b, settings);
+  }
+
+  async function refreshModels(btn) {
+    if (btn.dataset.busy === "1") return;
+    btn.dataset.busy = "1";
+    const old = btn.innerHTML;
+    btn.innerHTML = "⟳ Refreshing…";
+    btn.disabled = true;
+    try {
+      const r = await fetch("/models?reload=1", {cache:"no-store"});
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      window.location.reload();
+    } catch (e) {
+      console.error("USB_local_AI model refresh failed:", e);
+      btn.innerHTML = "Refresh failed";
+      setTimeout(()=>{ btn.innerHTML=old; btn.disabled=false; btn.dataset.busy="0"; }, 1800);
+    }
+  }
+
+  function addModelRefresh() {
+    const input = [...document.querySelectorAll('input')].find(x => x.placeholder === 'Search models...');
+    if (!input) return;
+    const panel = input.parentElement;
+    if (!panel || panel.querySelector('.usb-model-refresh')) return;
+
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'usb-model-refresh w-full rounded-md px-3 py-2 text-left text-xs text-muted-foreground hover:bg-accent hover:text-foreground';
+    b.innerHTML = '↻ Refresh Models';
+    b.title = 'Rescan the Models folder';
+    b.addEventListener('click', ()=>refreshModels(b));
+    panel.appendChild(b);
+  }
+
+  function install() {
+    addMcpSidebar();
+    addModelRefresh();
+  }
+
+  const observer = new MutationObserver(install);
+  const start = () => {
+    install();
+    observer.observe(document.body, {childList:true, subtree:true});
+  };
+  if (document.body) start();
+  else document.addEventListener('DOMContentLoaded', start, {once:true});
+})();
+
+export{lpt as app,mdn as start};
