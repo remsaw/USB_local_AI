@@ -60,9 +60,12 @@ if exist "%ROOT_DIR%\scripts\scan_models.ps1" (
 )
 echo.
 
-set "PRESET_ARG="
+:: Configure model loading (use models.ini preset if available, otherwise fallback to directory scan)
+set "MODEL_ARGS="
 if exist "%ROOT_DIR%\models.ini" (
-    set "PRESET_ARG=--models-preset "%ROOT_DIR%\models.ini""
+    set "MODEL_ARGS=--models-preset "%ROOT_DIR%\models.ini""
+) else (
+    set "MODEL_ARGS=--models-dir "%MODELS_DIR%""
 )
 
 echo --------------------------------------------------------
@@ -87,7 +90,8 @@ start "" "http://127.0.0.1:8080"
 echo [*] Starting llama-server router...
 echo.
 
-"%SERVER%" --host 127.0.0.1 --port 8080 !PRESET_ARG! --models-dir "%MODELS_DIR%" --models-max 1 --ctx-size 8192 --n-gpu-layers 0 --webui-mcp-proxy
+"%SERVER%" --host 127.0.0.1 --port 8080 !MODEL_ARGS! --models-max 1 --ctx-size 8192 --n-gpu-layers 0 --webui-mcp-proxy
+
 
 
 echo.

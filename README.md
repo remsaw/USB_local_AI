@@ -83,6 +83,7 @@ Because model files are several gigabytes each, they are not included in this re
 ```text
 USB Drive (e.g. E:\)
 ├── Start-AI-Router.bat          <-- Double-click to launch router & Web UI
+├── Open-MCP-Servers.bat         <-- One-click shortcut to MCP Servers management
 ├── Install-Llama-Router.bat     <-- Run once to download llama.cpp server
 ├── models.ini.template          <-- Template configuration reference
 ├── scripts\
@@ -140,9 +141,11 @@ Double-click **`Install-Llama-Router.bat`**.
 The server comes with **MCP CORS Proxy (`--webui-mcp-proxy`)** enabled, allowing your local models to connect to external MCP servers and tools directly through the Web UI.
 
 ### How to Access & Connect MCP Servers:
-You can access MCP server management in two ways:
+You can access MCP server management in three easy ways:
 1. **Via the Chat Input**: In the chat window, click the **`+`** icon on the left side of the input box (next to *"Type a message..."*), then click **MCP Servers**.
-2. **Via Direct URL**: Navigate directly to [`http://127.0.0.1:8080/#/mcp-servers`](http://127.0.0.1:8080/#/mcp-servers) in your browser.
+2. **Via One-Click Shortcut**: Double-click **`Open-MCP-Servers.bat`** on your USB drive.
+3. **Via Direct Browser URL**: Navigate directly to [`http://127.0.0.1:8080/#/mcp-servers`](http://127.0.0.1:8080/#/mcp-servers).
+
 3. Click **+ Add New Server**.
 4. Select from the **4 Built-in Recommended Servers** (or connect any custom MCP server by URL):
    - **Exa**: Real-time web search and full webpage content extraction into clean markdown.
