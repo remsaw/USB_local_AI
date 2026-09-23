@@ -20,6 +20,7 @@ No Python, no PyTorch, no Docker, no CUDA configuration, and no administrative p
 - 🔀 **Dynamic Model Router**: Switch between multiple models instantly from a single dropdown without restarting the server.
 - 💾 **Smart RAM Management (`--models-max 1`)**: Holds unlimited models on your USB drive while loading only one model into RAM at a time, preventing Out-Of-Memory (OOM) crashes on 8GB/16GB machines.
 - 🌐 **Modern Built-in Web UI**: Clean, responsive browser interface served locally at `http://127.0.0.1:8080`.
+- 💾 **Portable Chat History & Attachments**: Automatically saves conversations (`Data/conversations.json`) and uploaded files/images (`Data/uploads/`) directly to the USB drive, keeping your entire workflow available across different computers.
 - 🔌 **Native MCP (Model Context Protocol) Support**: Connect directly to remote MCP servers (Exa Web Search, Hugging Face, GitHub, Context7) via the Web UI sidebar to equip local models with live tools.
 - 🔌 **OpenAI-Compatible API**: Seamlessly connects with third-party tools like Continue.dev, Cursor, LibreChat, Chatbox, and Obsidian.
 
@@ -92,6 +93,9 @@ USB Drive (e.g. E:\)
 │   └── recommended-mcp\
 ├── scripts\
 │   └── scan_models.ps1          <-- Auto-detects models & pairs vision projectors
+├── Data\                        <-- Portable history & media (persists on USB)
+│   ├── conversations.json       <-- Chat history & message trees
+│   └── uploads\                 <-- Uploaded images, documents & media
 ├── Models\                      <-- Drop your models here
 │   ├── README.md
 │   ├── DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf      (Text model)
@@ -124,14 +128,18 @@ Double-click **`Install-Llama-Router.bat`**.
 2. Double-click **`Start-AI-Router.bat`**.
 3. Your default browser will automatically open to `http://127.0.0.1:8080`.
 
-🔄 Add & Refresh Models
-1. Place your GGUF model inside Models\
-2. Open the Web UI
-3. Open the model selector
-4. Click ↻ Refresh Models
-5. Select the new model
-6. Click Load
----
+### 🔄 How to Add & Refresh Models
+1. Place your `.gguf` model file inside the `Models\` folder.
+2. Open the Web UI at `http://127.0.0.1:8080`.
+3. Open the model selector dropdown in the top-left corner.
+4. Click **↻ Refresh Models**.
+5. Select your new model and start chatting!
+
+### 💾 Portable History & Chat Attachments
+- **Zero Data Loss Across Devices**: Your conversations are synchronized to `Data\conversations.json` directly on the USB drive.
+- **Persistent Media**: Any image, photo, screenshot, document, or audio clip uploaded in chat is automatically extracted and saved to `Data\uploads\` on the USB drive.
+- **Plug-and-Play Rehydration**: When plugging the USB into another computer and running `Start-AI-Router.bat`, the browser imports all previous conversations and images automatically.
+- **Sidebar Controls**: Use 💾 **Portable History** in the left sidebar to sync immediately on demand, or 🗑️ **Clear Chat History** to wipe all history and media from both the browser and the USB drive.
 
 ## 📸 How to Upload Images & Use Vision Models
 

@@ -23,6 +23,13 @@ models.ini
 *.log
 *.tmp
 
+# Portable chat history & uploaded media (privacy)
+Data/conversations.json
+Data/*.tmp
+Data/uploads/*
+!Data/uploads/.gitkeep
+!Data/README.txt
+
 # Windows system & USB drive files
 System Volume Information/
 $RECYCLE.BIN/

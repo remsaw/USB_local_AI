@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
-title Portable Local AI - Vision and Reasoning Router
+title Portable Local AI - Portable History Router
 cd /d "%~dp0"
 
 :: Get current directory without trailing backslash
@@ -86,6 +86,16 @@ echo  3. Reasoning Models: Select a [TEXT/R1] model to view
 echo     internal chain-of-thought tokens.
 echo  4. MCP Servers: Access 'MCP Servers' directly in the left
 echo     sidebar between Search and Settings.
+echo  5. Portable History: conversations and uploaded files/images are saved
+echo     to Data\conversations.json and Data\uploads\ on the USB drive.
+echo.
+echo [*] Starting Portable History service...
+if exist "%ROOT_DIR%\Portable-History-Server.ps1" (
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$c = Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue; if ($c) { Stop-Process -Id $c.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+    start "Portable AI History" /min powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%ROOT_DIR%\Portable-History-Server.ps1" -Root "%ROOT_DIR%" -Port 8765
+) else (
+    echo [!] Portable-History-Server.ps1 not found - continuing without portable history.
+)
 echo.
 echo [*] Opening Web UI in your default browser...
 start "" "http://127.0.0.1:8080"
@@ -94,8 +104,9 @@ echo.
 
 "%SERVER%" --host 127.0.0.1 --port 8080 !MODEL_ARGS! !WEBUI_ARG! --models-max 1 --ctx-size 8192 --n-gpu-layers 0 --webui-mcp-proxy
 
-
-
+echo.
+echo [*] Stopping Portable History service...
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$c = Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue; if ($c) { Stop-Process -Id $c.OwningProcess -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 
 echo.
 echo ========================================================

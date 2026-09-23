@@ -3769,8 +3769,15 @@ Expecting `+re.join(", ")+", got '"+(this.terminals_[H]||H)+"'":Z="Parse error o
     fill: ${i.axisTextColor};
   }
   `},"styles"),Jun={parser:Rut,db:Yun,renderer:Qun,styles:Zun};const edn=Object.freeze(Object.defineProperty({__proto__:null,diagram:Jun},Symbol.toStringTag,{value:"Module"})),tdn=Object.freeze(Object.defineProperty({__proto__:null,InfoModule:Dst,createInfoServices:Mst},Symbol.toStringTag,{value:"Module"})),rdn=Object.freeze(Object.defineProperty({__proto__:null,PacketModule:Lst,createPacketServices:Pst},Symbol.toStringTag,{value:"Module"})),ndn=Object.freeze(Object.defineProperty({__proto__:null,PieModule:Fst,createPieServices:Bst},Symbol.toStringTag,{value:"Module"})),idn=Object.freeze(Object.defineProperty({__proto__:null,TreeViewModule:Ust,createTreeViewServices:$st},Symbol.toStringTag,{value:"Module"})),adn=Object.freeze(Object.defineProperty({__proto__:null,ArchitectureModule:Gst,createArchitectureServices:zst},Symbol.toStringTag,{value:"Module"})),sdn=Object.freeze(Object.defineProperty({__proto__:null,GitGraphModule:Ist,createGitGraphServices:kst},Symbol.toStringTag,{value:"Module"})),odn=Object.freeze(Object.defineProperty({__proto__:null,EventModelingModule:Hst,createEventModelingServices:Vst},Symbol.toStringTag,{value:"Module"})),ldn=Object.freeze(Object.defineProperty({__proto__:null,RadarModule:Cst,createRadarServices:wst},Symbol.toStringTag,{value:"Module"})),cdn=Object.freeze(Object.defineProperty({__proto__:null,TreemapModule:Ast,createTreemapServices:Rst},Symbol.toStringTag,{value:"Module"})),udn=Object.freeze(Object.defineProperty({__proto__:null,WardleyModule:Nst,createWardleyServices:Ost},Symbol.toStringTag,{value:"Module"}));
-/* USB_local_AI custom UI enhancements - v3 */
+/* USB_local_AI custom UI enhancements - v5 */
 (()=> {
+  const PORTABLE_SYNC_URL = 'http://127.0.0.1:8765';
+  const PORTABLE_DB = 'LlamaUi';
+  let syncBusy = false;
+  let initialSyncDone = false;
+  let lastSyncLocalHash = '';
+  let lastServerUpdated = 0;
+
   function findNativeMcp() {
     return [...document.querySelectorAll('button,a')].find(el =>
       (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '').trim() === 'MCP Servers'
@@ -3778,51 +3785,34 @@ Expecting `+re.join(", ")+", got '"+(this.terminals_[H]||H)+"'":Z="Parse error o
   }
 
   function addMcpSidebar() {
-    // The current bundle already has a native MCP Servers item.
-    // Do NOT intercept its click; the app router owns that navigation.
     if (findNativeMcp()) return;
-
     if (document.getElementById('usb-local-ai-mcp')) return;
-
     const settings = [...document.querySelectorAll('button,a')].find(el =>
       (el.getAttribute('aria-label') || el.getAttribute('title') || '').trim() === 'Settings'
     );
     if (!settings || !settings.parentElement) return;
-
     const b = document.createElement('a');
-    b.id = 'usb-local-ai-mcp';
-    b.href = '/#/mcp-servers';
-    b.title = 'MCP Servers';
-    b.setAttribute('aria-label','MCP Servers');
+    b.id = 'usb-local-ai-mcp'; b.href = '/#/mcp-servers'; b.title = 'MCP Servers'; b.setAttribute('aria-label','MCP Servers');
     b.className = settings.className || 'flex items-center justify-center';
     b.innerHTML = '<span style="font-size:18px;line-height:1">🔌</span><span class="usb-mcp-label">MCP Servers</span>';
     b.style.cssText += ';display:flex;align-items:center;justify-content:flex-start;';
-
     const style = document.createElement('style');
-    style.textContent = `
-      #usb-local-ai-mcp .usb-mcp-label{display:none;margin-left:8px;white-space:nowrap}
-      .is-expanded #usb-local-ai-mcp .usb-mcp-label{display:inline}
-      #usb-local-ai-mcp{min-height:36px}
-    `;
+    style.textContent = '#usb-local-ai-mcp .usb-mcp-label{display:none;margin-left:8px;white-space:nowrap}.is-expanded #usb-local-ai-mcp .usb-mcp-label{display:inline}#usb-local-ai-mcp{min-height:36px}';
     document.head.appendChild(style);
-
     settings.parentElement.insertBefore(b, settings);
   }
 
   async function refreshModels(btn) {
-    if (btn.dataset.busy === "1") return;
-    btn.dataset.busy = "1";
-    const old = btn.innerHTML;
-    btn.innerHTML = "⟳ Refreshing…";
-    btn.disabled = true;
+    if (btn.dataset.busy === '1') return;
+    btn.dataset.busy = '1'; const old = btn.innerHTML; btn.innerHTML = '⟳ Refreshing…'; btn.disabled = true;
     try {
-      const r = await fetch("/models?reload=1", {cache:"no-store"});
-      if (!r.ok) throw new Error("HTTP " + r.status);
+      const r = await fetch('/models?reload=1', { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
       window.location.reload();
-    } catch (e) {
-      console.error("USB_local_AI model refresh failed:", e);
-      btn.innerHTML = "Refresh failed";
-      setTimeout(()=>{ btn.innerHTML=old; btn.disabled=false; btn.dataset.busy="0"; }, 1800);
+    } catch(e) {
+      console.error('USB_local_AI model refresh failed:', e);
+      btn.innerHTML = 'Refresh failed';
+      setTimeout(() => { btn.innerHTML = old; btn.disabled = false; btn.dataset.busy = '0'; }, 1800);
     }
   }
 
@@ -3831,28 +3821,344 @@ Expecting `+re.join(", ")+", got '"+(this.terminals_[H]||H)+"'":Z="Parse error o
     if (!input) return;
     const panel = input.parentElement;
     if (!panel || panel.querySelector('.usb-model-refresh')) return;
-
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'usb-model-refresh w-full rounded-md px-3 py-2 text-left text-xs text-muted-foreground hover:bg-accent hover:text-foreground';
     b.innerHTML = '↻ Refresh Models';
     b.title = 'Rescan the Models folder';
-    b.addEventListener('click', ()=>refreshModels(b));
+    b.addEventListener('click', () => refreshModels(b));
     panel.appendChild(b);
+  }
+
+  function openPortableDb() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(PORTABLE_DB);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains('conversations')) {
+          const s = db.createObjectStore('conversations', { keyPath: 'id' });
+          s.createIndex('lastModified', 'lastModified');
+          s.createIndex('currNode', 'currNode');
+          s.createIndex('name', 'name');
+        }
+        if (!db.objectStoreNames.contains('messages')) {
+          const s = db.createObjectStore('messages', { keyPath: 'id' });
+          s.createIndex('convId', 'convId');
+          s.createIndex('type', 'type');
+          s.createIndex('role', 'role');
+          s.createIndex('timestamp', 'timestamp');
+          s.createIndex('parent', 'parent');
+          s.createIndex('children', 'children', { multiEntry: true });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function getStoreAll(db, name) {
+    return new Promise((resolve, reject) => {
+      if (!db.objectStoreNames.contains(name)) return resolve([]);
+      const tx = db.transaction(name, 'readonly');
+      const req = tx.objectStore(name).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function putAll(db, name, rows) {
+    return new Promise((resolve, reject) => {
+      if (!rows || rows.length === 0) return resolve();
+      const tx = db.transaction(name, 'readwrite');
+      const st = tx.objectStore(name);
+      for (const row of rows) {
+        if (row && row.id != null) st.put(row);
+      }
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async function readLocal() {
+    const db = await openPortableDb();
+    const [conversations, messages] = await Promise.all([
+      getStoreAll(db, 'conversations'),
+      getStoreAll(db, 'messages')
+    ]);
+    db.close();
+    return { version: 1, updated: Date.now(), conversations, messages };
+  }
+
+  async function writeLocal(data) {
+    const db = await openPortableDb();
+    await putAll(db, 'conversations', data.conversations || []);
+    await putAll(db, 'messages', data.messages || []);
+    db.close();
+  }
+
+  function calcLocalHash(local) {
+    const convs = local.conversations || [];
+    const msgs = local.messages || [];
+    let maxMod = 0;
+    for (const c of convs) { if (c.lastModified > maxMod) maxMod = c.lastModified; }
+    let maxMsg = 0;
+    for (const m of msgs) { if (m.timestamp > maxMsg) maxMsg = m.timestamp; }
+    return `${convs.length}:${maxMod}_${msgs.length}:${maxMsg}`;
+  }
+
+  function mergeById(a, b, timeKey) {
+    const m = new Map();
+    for (const x of (a || [])) {
+      if (x && x.id != null) m.set(String(x.id), x);
+    }
+    for (const x of (b || [])) {
+      if (!x || x.id == null) continue;
+      const k = String(x.id), old = m.get(k);
+      if (!old) {
+        m.set(k, x);
+        continue;
+      }
+      const ot = Number(old[timeKey] || 0), nt = Number(x[timeKey] || 0);
+      if (nt > ot) {
+        m.set(k, x);
+      } else if (nt === ot) {
+        const newHasExtra = (x.extra && Array.isArray(x.extra) && x.extra.length > 0);
+        const oldHasExtra = (old.extra && Array.isArray(old.extra) && old.extra.length > 0);
+        if (newHasExtra || !oldHasExtra) m.set(k, x);
+      }
+    }
+    return [...m.values()];
+  }
+
+  function mergeData(a, b) {
+    return {
+      version: 1,
+      updated: Date.now(),
+      conversations: mergeById(a.conversations, b.conversations, 'lastModified'),
+      messages: mergeById(a.messages, b.messages, 'timestamp')
+    };
+  }
+
+  async function serverGet() {
+    const r = await fetch(PORTABLE_SYNC_URL + '/sync', { cache: 'no-store' });
+    if (!r.ok) throw new Error('Portable history server HTTP ' + r.status);
+    return await r.json();
+  }
+
+  async function serverSync(data) {
+    const r = await fetch(PORTABLE_SYNC_URL + '/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!r.ok) throw new Error('Portable history sync HTTP ' + r.status);
+    return await r.json();
+  }
+
+  function setHistoryStatus(text, ok = true) {
+    const el = document.getElementById('usb-portable-history');
+    if (!el) return;
+    el.title = text;
+    el.setAttribute('aria-label', text);
+    el.dataset.ok = ok ? '1' : '0';
+    const label = el.querySelector('.usb-history-label');
+    if (label) label.textContent = ok ? 'Portable History' : 'History Offline';
+  }
+
+  async function syncPortableHistory(reloadIfNew = false) {
+    if (syncBusy) return;
+    syncBusy = true;
+    try {
+      const local = await readLocal();
+      const currentLocalHash = calcLocalHash(local);
+      const remote = await serverGet();
+
+      const localIds = new Set((local.conversations || []).map(x => String(x.id)));
+      const remoteIds = new Set((remote.conversations || []).map(x => String(x.id)));
+      const localMsgIds = new Set((local.messages || []).map(x => String(x.id)));
+      const remoteMsgIds = new Set((remote.messages || []).map(x => String(x.id)));
+
+      const remoteHasNew = [...remoteIds].some(id => !localIds.has(id)) || [...remoteMsgIds].some(id => !localMsgIds.has(id));
+      const localHasNew = [...localIds].some(id => !remoteIds.has(id)) || [...localMsgIds].some(id => !remoteMsgIds.has(id));
+
+      const merged = mergeData(local, remote);
+      await writeLocal(merged);
+
+      // Only POST to server if there are local additions/changes or initial sync
+      let saved = remote;
+      if (localHasNew || (local.messages && local.messages.length > (remote.messages || []).length) || (remote.updated || 0) < local.updated) {
+        saved = await serverSync(merged);
+      }
+
+      lastServerUpdated = saved.updated || Date.now();
+      lastSyncLocalHash = calcLocalHash(merged);
+
+      setHistoryStatus('Portable History: synced to USB (attachments preserved)', true);
+
+      // On a new device, if remote history was pulled into local database, reload once so Svelte UI renders it
+      if (reloadIfNew && remoteHasNew && !sessionStorage.getItem('usbPortableReloaded')) {
+        sessionStorage.setItem('usbPortableReloaded', '1');
+        window.location.reload();
+        return;
+      }
+      return saved;
+    } catch(e) {
+      console.warn('USB_local_AI portable history sync unavailable:', e);
+      setHistoryStatus('Portable History server not running', false);
+    } finally {
+      syncBusy = false;
+    }
+  }
+
+  function addPortableHistoryButton() {
+    if (document.getElementById('usb-portable-history')) return;
+    const settings = [...document.querySelectorAll('button,a')].find(el =>
+      (el.getAttribute('aria-label') || el.getAttribute('title') || '').trim() === 'Settings'
+    );
+    if (!settings || !settings.parentElement) return;
+
+    const b = document.createElement('button');
+    b.id = 'usb-portable-history';
+    b.type = 'button';
+    b.title = 'Portable History (click to sync now)';
+    b.setAttribute('aria-label', 'Portable History');
+    b.className = settings.className || 'flex items-center justify-center';
+    b.innerHTML = '<span style="font-size:18px;line-height:1">💾</span><span class="usb-history-label">Portable History</span>';
+    b.style.cssText += ';display:flex;align-items:center;justify-content:flex-start;';
+
+    b.addEventListener('click', async () => {
+      b.disabled = true;
+      const old = b.innerHTML;
+      b.innerHTML = '<span style="font-size:18px;line-height:1">⟳</span><span class="usb-history-label">Syncing…</span>';
+      await syncPortableHistory(false);
+      b.innerHTML = '<span style="font-size:18px;line-height:1">✓</span><span class="usb-history-label">Synced to USB</span>';
+      setTimeout(() => { b.innerHTML = old; b.disabled = false; }, 1500);
+    });
+
+    const style = document.createElement('style');
+    style.textContent = '#usb-portable-history .usb-history-label{display:none;margin-left:8px;white-space:nowrap}.is-expanded #usb-portable-history .usb-history-label{display:inline}#usb-portable-history[data-ok="0"]{opacity:.55}#usb-portable-history{min-height:36px}';
+    document.head.appendChild(style);
+    settings.parentElement.insertBefore(b, settings);
+  }
+
+  async function checkServerHealthAndSync() {
+    if (syncBusy) return;
+    try {
+      const r = await fetch(PORTABLE_SYNC_URL + '/health', { cache: 'no-store' });
+      if (!r.ok) { setHistoryStatus('Portable History offline', false); return; }
+      const health = await r.json();
+      setHistoryStatus('Portable History: synced to USB', true);
+
+      // Check if local has changed since last sync
+      const local = await readLocal();
+      const currentHash = calcLocalHash(local);
+      if (currentHash !== lastSyncLocalHash || (health.updated && health.updated > lastServerUpdated)) {
+        await syncPortableHistory(false);
+      }
+    } catch {
+      setHistoryStatus('Portable History server not running', false);
+    }
+  }
+
+  async function startPortableHistory() {
+    if (initialSyncDone) return;
+    initialSyncDone = true;
+    try {
+      const r = await fetch(PORTABLE_SYNC_URL + '/health', { cache: 'no-store' });
+      if (!r.ok) return;
+    } catch {
+      return;
+    }
+    setHistoryStatus('Portable History: connecting…', true);
+    await syncPortableHistory(true);
+
+    // Smart polling: check health every 8s, and sync only when dirty
+    setInterval(checkServerHealthAndSync, 8000);
+
+    // Also sync on window focus or before unload
+    window.addEventListener('focus', checkServerHealthAndSync);
+    window.addEventListener('beforeunload', () => {
+      // Fire-and-forget sync on unload if dirty
+      checkServerHealthAndSync();
+    });
+  }
+
+  async function clearPortableHistory(btn) {
+    if (btn.dataset.busy === '1') return;
+    const ok = window.confirm('Delete ALL chat history and uploaded files from this Portable AI USB drive?\n\nThis cannot be undone.');
+    if (!ok) return;
+    btn.dataset.busy = '1';
+    const old = btn.innerHTML;
+    btn.innerHTML = '⟳ Clearing…';
+    btn.disabled = true;
+    try {
+      const r = await fetch(PORTABLE_SYNC_URL + '/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+        cache: 'no-store'
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+
+      // Clear the browser-side conversation and message stores
+      const db = await openPortableDb();
+      const tx = db.transaction(['conversations', 'messages'], 'readwrite');
+      tx.objectStore('conversations').clear();
+      tx.objectStore('messages').clear();
+      await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); });
+      db.close();
+
+      btn.innerHTML = '✓ History Cleared';
+      sessionStorage.removeItem('usbPortableReloaded');
+      setTimeout(() => window.location.reload(), 700);
+    } catch(e) {
+      console.error('USB_local_AI clear history failed:', e);
+      btn.innerHTML = 'Clear failed';
+      setTimeout(() => { btn.innerHTML = old; btn.disabled = false; btn.dataset.busy = '0'; }, 1800);
+    }
+  }
+
+  function addClearHistory() {
+    if (document.getElementById('usb-clear-history')) return;
+    const anchor = [...document.querySelectorAll('button,a')].find(el =>
+      (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '').trim() === 'Portable History'
+    );
+    if (!anchor || !anchor.parentElement) return;
+
+    const b = document.createElement('button');
+    b.id = 'usb-clear-history';
+    b.type = 'button';
+    b.title = 'Delete all portable chat history and uploaded media';
+    b.setAttribute('aria-label', 'Clear Chat History');
+    b.className = anchor.className || 'flex items-center justify-center';
+    b.style.cssText += ';display:flex;align-items:center;justify-content:flex-start;';
+    b.innerHTML = '<span style="font-size:17px;line-height:1">🗑️</span><span class="usb-clear-label" style="margin-left:8px;white-space:nowrap">Clear Chat History</span>';
+
+    const style = document.createElement('style');
+    style.textContent = '#usb-clear-history .usb-clear-label{display:none}.is-expanded #usb-clear-history .usb-clear-label{display:inline}#usb-clear-history{min-height:36px}';
+    document.head.appendChild(style);
+
+    b.addEventListener('click', () => clearPortableHistory(b));
+    anchor.parentElement.appendChild(b);
   }
 
   function install() {
     addMcpSidebar();
     addModelRefresh();
+    addPortableHistoryButton();
+    addClearHistory();
   }
 
   const observer = new MutationObserver(install);
   const start = () => {
     install();
-    observer.observe(document.body, {childList:true, subtree:true});
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(startPortableHistory, 1500);
   };
+
   if (document.body) start();
-  else document.addEventListener('DOMContentLoaded', start, {once:true});
+  else document.addEventListener('DOMContentLoaded', start, { once: true });
 })();
 
 export{lpt as app,mdn as start};
+
